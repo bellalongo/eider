@@ -340,22 +340,22 @@ class GTMatrix:
         plt.tight_layout()
 
         # Save and show the plot
-        plt.savefig(f'{self.gtmat_dir}/gtmat_heatmap_{self.star_name}.pdf', dpi=5, bbox_inches='tight')
-        plt.show()
+        # plt.savefig(f'{self.gtmat_dir}/gtmat_heatmap_{self.star_name}.pdf', dpi=1, bbox_inches='tight')
+        # plt.show()
 
 
     @staticmethod
     def gtmat_integral(gtmat: np.ndarray,
-                       temp: np.nparray,
+                       temp: np.ndarray,
                        psi_model: np.ndarray,
                        flux_weighting: float) -> np.ndarray:
         """
 
         """
-        # Create the array
-        intensity_array = [np.trapz(
-            gtmat[i, :] * psi_model, 
-            temp) * flux_weighting 
-            for i in range(len(np.shape(gtmat)[0]))] 
-
-        return np.array(intensity_array)
+        # Multiply G(T) by psi(T) for all wavelengths at once
+        integrand = gtmat * psi_model[np.newaxis, :]
+        
+        # Integrate over temperature dimension for all wavelengths at once
+        intensity_array = np.trapz(integrand, temp, axis=1) * flux_weighting
+        
+        return intensity_array

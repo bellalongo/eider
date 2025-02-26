@@ -105,7 +105,7 @@ class DEMLikelihood:
             return -np.inf
             
         # Calculate model spectrum
-        model = GTMatrix.gtmat_integral(psi_model, gtmat, temp, flux_weighting)
+        model = GTMatrix.gtmat_integral(gtmat, temp, psi_model, flux_weighting)
         
         # Calculate log likelihood
         var_term = (flux_factor * model)**2 + yerr**2

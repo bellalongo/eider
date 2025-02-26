@@ -1,5 +1,6 @@
 from gtmatrix import *
-# from dem import *
+from spectrum import *
+from dem import *
 
 from astropy import units as u
 
@@ -19,13 +20,13 @@ def main():
     gtmat_dir = 'gtmat' # G(T) matrix directory  
     
     # Generate G(t) matrix
-    gtmat = GTMatrix(star_name, abundance, abundance_file, flux_file, gtmat_dir)
+    gtmatrix = GTMatrix(star_name, abundance, abundance_file, flux_file, gtmat_dir)
+
+    # Generate spectrum from xray data
+    spectrum = Spectrum(gtmatrix)
 
     # Generate DEM
-    dem = DEM(gtmat, radius, distance)
-
-
-    print('Done')
+    dem = DEM(gtmatrix, radius, distance)
     
     
 if __name__ == '__main__':

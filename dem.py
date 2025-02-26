@@ -8,19 +8,21 @@ from os.path import exists
 
 class DEM:
     def __init__(self, 
-                 gtmat: np.ndarray, 
+                 gtmatrix, 
                  radius: u.Quantity, 
                  distance: u.Quantity):
         """
 
         """
-        self.gtmat = gtmat
+        self.gtmatrix = gtmatrix
         self.radius = radius 
         self.distance = distance
 
+        print(len(gtmatrix.ion_fluxes), len(gtmatrix.ion_errs))
+
         # MCMC result files
-        self.sample_dir = f'mcmc/samples_{self.gtmat.star_name}'
-        self.lnprob_dir = f'mcmc/lnprob_{self.gtmat.star_name}'
+        self.sample_dir = f'mcmc/samples_{self.gtmatrix.star_name}'
+        self.lnprob_dir = f'mcmc/lnprob_{self.gtmatrix.star_name}'
         
         # Temperature grid
         self.temp = np.logspace(4, 8, 200)
@@ -43,8 +45,10 @@ class DEM:
         
         # Check if MCMC has already been performed
         if exists(self.sample_dir) and exists(self.lnprob_dir):
-            samples = np.load(self.sample_dir)
-            lnprob = np.load(self.lnprob_dir)
+            self.samples = np.load(self.sample_dir)
+            self.lnprob = np.load(self.lnprob_dir)
+        else:
+            self.samples, self.lnprob, _ = self.run_mcmc(self.gtmatrix.ion_fluxes, self.gtmatrix.ion_errs)
 
 
     def run_mcmc(self, 
@@ -76,7 +80,7 @@ class DEM:
             err, 
             self.log_temp,
             self.temp,
-            self.gtmat,
+            self.gtmatrix.gtmat,
             self.flux_weighting
         ]
 

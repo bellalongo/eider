@@ -70,6 +70,7 @@ class MCMCFitter:
        
        sampler.reset()
        return p0, prob
+   
        
    def run_production(self, 
                       pos: List[np.ndarray], 
