@@ -31,7 +31,6 @@ class MCMCFitter:
        self.config = config
        self._sampler = None
 
-       
    def initialize_walkers(self, 
                           init_pos: np.ndarray
                           ) -> List[np.ndarray]:
