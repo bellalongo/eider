@@ -82,6 +82,7 @@ class DEM:
 
         """
         return exists(self.sample_dir) and exists(self.lnprob_dir)
+
     
     # ------------------------------
     # Public Methods
@@ -110,6 +111,8 @@ class DEM:
         # Get flux and error data
         flux = self.gtmatrix.ion_fluxes
         err = self.gtmatrix.ion_errs
+
+        gtmat_subset = self.gtmatrix.gtmat[self.gtmatrix.get_emission_line_indices]
         
         # Create MCMC configuration
         config = MCMCConfig(
@@ -123,13 +126,14 @@ class DEM:
         # Initialize fitter
         fitter = MCMCFitter(config)
         
-        # Package likelihood arguments
+        
+        # Package likelihood arguments with the subset of G(T) matrix
         likelihood_args = [
             flux,
             err, 
             self.log_temp,
             self.temp,
-            self.gtmatrix.gtmat,
+            gtmat_subset,  
             self.flux_weighting
         ]
 

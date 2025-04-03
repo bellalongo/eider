@@ -424,3 +424,27 @@ class GTMatrix:
         intensity_array = np.trapz(integrand, temp, axis=1) * flux_weighting
         
         return intensity_array
+        
+    def get_emission_line_indices(self):
+        """
+
+        """
+        if not hasattr(self, 'ion_list') or self.ion_list is None:
+            raise ValueError("No emission line data loaded. Call load_line_data() first.")
+            
+        # Get wavelengths of emission lines from the chianti_table
+        emission_line_wavelengths = self.chianti_table['Wavelength_vacuum']
+        
+        # Initialize array to store indices
+        line_indices = []
+        
+        # For each emission line wavelength, find the closest matching index in the wavelength grid
+        for line_wave in emission_line_wavelengths:
+            # Find the index of the wavelength bin that contains this emission line
+            index = np.argmin(np.abs(self.wave_arr - line_wave))
+            line_indices.append(index)
+        
+        # Save these indices for later use
+        self.emission_line_indices = np.array(line_indices)
+        
+        return self.emission_line_indices
