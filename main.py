@@ -21,12 +21,17 @@ def main():
     
     # Generate G(t) matrix
     gtmatrix = GTMatrix(star_name, abundance, abundance_file, flux_file, gtmat_dir)
+    gtmatrix.initialize()
+    gtmatrix.load_line_data()
+    gtmatrix.generate_gtmatrix()
 
-    # Generate spectrum from xray data
-    spectrum = Spectrum(gtmatrix)
+    # # Run MCMC
 
-    # Generate DEM
-    dem = DEM(gtmatrix, radius, distance)
+    # # Generate spectrum from xray data
+    # spectrum = Spectrum(gtmatrix)
+
+    # # Generate DEM
+    # dem = DEM(gtmatrix, radius, distance)
     
     
 if __name__ == '__main__':

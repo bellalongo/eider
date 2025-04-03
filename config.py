@@ -55,6 +55,7 @@ DEM_CONFIG = {
     'burn_in_steps': 200,               # Number of burn-in steps
     'production_steps': 800,            # Number of production steps
     'thread_num': 4,                    # Number of threads for parallel processing
+    'progress_interval': 100,           # something ?
     'init_chebyshev': [                 # Initial Chebyshev coefficients
         22.49331207,  # c₀: First Chebyshev coefficient - sets overall DEM magnitude
         -3.31678227,  # c₁: Second Chebyshev coefficient  
