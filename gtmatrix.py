@@ -243,7 +243,7 @@ class GTMatrix:
             self.ion_fluxes[ion_idx] = np.sum(self.chianti_table['Flux'][ion_mask])
             self.ion_errs[ion_idx] = np.sqrt(
                 np.sum((self.chianti_table['Error'][ion_mask])**2))
-
+            
         # Iterate through wavelength pairs and add contributions
         try:
             wavelengths = zip(wavelength_lower, wavelength_upper)
@@ -303,9 +303,10 @@ class GTMatrix:
         
         # Extract unique ions and initialize arrays
         self.ion_list = np.unique(self.chianti_table['Ion'])
+        self.ion_fluxes = self.chianti_table['Flux']
         self.ion_fluxes = np.zeros(len(self.ion_list))
         self.ion_errs = np.zeros_like(self.ion_fluxes)
-        
+
         print(f"Loaded emission line data: {len(self.ion_list)} unique ions with emission line measurements")
 
     def generate_gtmatrix(self, 
@@ -437,9 +438,6 @@ class GTMatrix:
         """
         if not hasattr(self, 'ion_list') or self.ion_list is None:
             raise ValueError("No emission line data loaded. Call load_line_data() first.")
-            
-        # Get wavelengths of emission lines from the chianti_table
-        emission_line_wavelengths = self.chianti_table['Rest Wavelength']
         
         # Initialize array to store indices
         line_indices = []
@@ -461,19 +459,9 @@ class GTMatrix:
                 
                 # Find the corresponding index in the wavelength grid
                 index = np.argmin(np.abs(self.wave_arr - rep_wavelength))
-                
-                # Make sure the index is within bounds
-                if 0 <= index < len(self.wave_arr):
-                    line_indices.append(index)
+                line_indices.append(index)
         
         # Save these indices for later use
         self.emission_line_indices = np.array(line_indices)
 
-        # Double-check that the number of indices matches the number of ions
-        if len(line_indices) != len(self.ion_list):
-            print(f"Warning: Number of indices ({len(line_indices)}) doesn't match number of ions ({len(self.ion_list)})")
-
-        # Print diagnostic information
-        print(f"Found {len(line_indices)} emission line indices")
-        
         return self.emission_line_indices

@@ -1,10 +1,5 @@
 import os
 
-# Set environment variable before any other imports
-if 'XUVTOP' not in os.environ:
-    os.environ['XUVTOP'] = '/Users/bella/Desktop/LASP/Stars/CHIANTI_10.1_database'
-    print(f"XUVTOP environment set to {os.environ['XUVTOP']}")
-
 from utils import *
 from gtmatrix import *
 from spectrum import *
@@ -13,8 +8,10 @@ from config import *
 
 
 def main():
-    # Check environment
-    check_environment(PATH_CONFIG)
+    # Set environment variable before any other imports
+    if 'XUVTOP' not in os.environ:
+        os.environ['XUVTOP'] = '/Users/bella/Desktop/LASP/Stars/CHIANTI_10.1_database'
+        print(f"XUVTOP environment set to {os.environ['XUVTOP']}")
 
     # Create output directories
     create_directories(PATH_CONFIG)
@@ -30,15 +27,16 @@ def main():
     dem = DEM(gtmatrix, DEM_CONFIG, STAR_CONFIG)
     
     # Run MCMC (or load existing results)
-    samples, lnprob, sampler = dem.run_mcmc()
+    dem.run_mcmc()
+    dem.plot_dem()
 
     # Create Spectrum object
     spectrum = Spectrum(dem)
     
-    # Generate and plot spectrum
-    spectrum.generate_spectrum(sample_num=1000) # -> Add me to config !
-    spectrum.plot_spectrum(save_path=PATH_CONFIG) # -> add me to path config !
-    plt.show()
+    # # Generate and plot spectrum
+    # spectrum.generate_spectrum(sample_num=1000) # -> Add me to config !
+    # spectrum.plot_spectrum(save_path=PATH_CONFIG) # -> add me to path config !
+    # plt.show()
 
     
 

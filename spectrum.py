@@ -68,9 +68,8 @@ class Spectrum:
         return self.spectrum_table
     
     def plot_spectrum(self, 
-                     alpha: float = 0.3, 
-                     color: str = 'b',
-                     save_path: str = None) -> plt.Figure:
+                    alpha: float = 0.3, 
+                    color: str = 'b') -> plt.Figure:
         """
 
         """
@@ -94,7 +93,7 @@ class Spectrum:
         # Plot the spectrum
         plt.semilogy(wave, flux, drawstyle='steps-mid', color=color)
         plt.fill_between(wave, flux - lower_err, flux + upper_err, 
-                         color=color, alpha=alpha, step='mid')
+                        color=color, alpha=alpha, step='mid')
         
         # Add labels
         plt.title(f'{self.dem.star_name} Synthetic Spectrum')
@@ -102,12 +101,12 @@ class Spectrum:
         plt.ylabel(r'Flux [erg s$^{-1}$ cm$^{-2}$ $\mathrm{\AA}^{-1}$]')
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
-        
-        # Save if requested
-        if save_path:
-            plt.savefig(save_path, dpi=300)
-            print(f"Spectrum plot saved to {save_path}")
-            
+
+        save_path = f'plots/spectrum_{self.dem.gtmatrix.star_name}.png'
+
+        plt.savefig(save_path, dpi=300)
+        print(f"Spectrum plot saved to {save_path}")
+                
         return plt.gcf()
     
     def _generate_spectrum_from_samples(self, 
@@ -119,7 +118,7 @@ class Spectrum:
                                        bin_arr,
                                        sample_num: int = 1000) -> Tuple[Table, np.ndarray]:
         """
-        
+
         """
         save_name = self.spectrum_path.replace('.fits', '')
         

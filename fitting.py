@@ -4,13 +4,12 @@ import multiprocessing
 from typing import List, Callable, Any, Tuple
 from dataclasses import dataclass
 from concurrent.futures import ThreadPoolExecutor
-from tqdm import tqdm
 
 
 @dataclass
 class MCMCConfig:
    """
-
+    
    """
    n_walkers: int
    burn_in_steps: int 
@@ -24,18 +23,18 @@ class MCMCConfig:
 
 class MCMCFitter:
     """
-
+        
     """
     def __init__(self, config):
        """
-                
+
        """
        self.config = config
        self._sampler = None
 
     def initialize_walkers(self, init_pos: np.ndarray) -> List[np.ndarray]:
         """
-            
+        Initialize the walkers around the initial position.
         """
         # Get the number of dimensions in the initial position
         ndim = len(init_pos)
@@ -51,18 +50,12 @@ class MCMCFitter:
                     steps: int
                     ) -> Tuple[List[np.ndarray], np.ndarray]:
         """
-            
+        Run the burn-in phase of MCMC.
         """
         print("Running burn-in...")
         
-        # Use tqdm to create a progress bar for the burn-in phase
-        with tqdm(total=steps, desc="Burn-in", unit="step") as pbar:
-            # Define a callback for progress updates
-            def update_progress(state, *args):
-                pbar.update(1)
-            
-            # Run the MCMC with progress tracking
-            p0, prob, _ = sampler.run_mcmc(pos, steps, progress=update_progress)
+        # Use emcee's built-in progress monitoring
+        p0, prob, _ = sampler.run_mcmc(pos, steps, progress=True)
         
         # Reset positions around highest probability position
         best_pos = p0[np.argmax(prob)]
@@ -83,18 +76,12 @@ class MCMCFitter:
                         steps: int
                         ) -> None:
         """
-            
+        Run the production phase of MCMC.
         """
         print("Running production...")
         
-        # Use tqdm to create a progress bar for the production phase
-        with tqdm(total=steps, desc="Production", unit="step") as pbar:
-            # Define a callback for progress updates
-            def update_progress(state, *args):
-                pbar.update(1)
-            
-            # Run the MCMC with progress tracking
-            sampler.run_mcmc(pos, steps, progress=update_progress)
+        # Use emcee's built-in progress monitoring
+        sampler.run_mcmc(pos, steps, progress=True)
 
     def fit(self, 
             init_pos: np.ndarray,
@@ -102,7 +89,7 @@ class MCMCFitter:
             likelihood_args: List[Any]
             ) -> Tuple[np.ndarray, np.ndarray, emcee.EnsembleSampler]:
         """
-            
+        Perform MCMC fitting with burn-in and production phases.
         """
         print(f'Starting ln_likelihood: {likelihood_func(init_pos, *likelihood_args)}')
         
