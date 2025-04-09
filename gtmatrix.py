@@ -443,18 +443,35 @@ class GTMatrix:
         
         # Initialize array to store indices
         line_indices = []
-        
-        # For each emission line wavelength, find the closest matching index in the wavelength grid
-        for line_wave in emission_line_wavelengths:
-            # Find the index of the wavelength bin that contains this emission line
-            index = np.argmin(np.abs(self.wave_arr - line_wave))
+
+        # Process each unique ion
+        for ion in self.ion_list:
+            # Find all measurements for this ion
+            ion_mask = self.chianti_table['Ion'] == ion
             
-            # Make sure the index is within bounds
-            if 0 <= index < len(self.wave_arr):
-                line_indices.append(index)
+            # Get wavelengths and fluxes for this ion
+            ion_wavelengths = self.chianti_table['Rest Wavelength'][ion_mask]
+            ion_fluxes = self.chianti_table['Flux'][ion_mask]
+            
+            # Choose the representative wavelength (strongest line)
+            if len(ion_wavelengths) > 0:
+                # Use the wavelength with the highest flux
+                best_idx = np.argmax(ion_fluxes)
+                rep_wavelength = ion_wavelengths[best_idx]
+                
+                # Find the corresponding index in the wavelength grid
+                index = np.argmin(np.abs(self.wave_arr - rep_wavelength))
+                
+                # Make sure the index is within bounds
+                if 0 <= index < len(self.wave_arr):
+                    line_indices.append(index)
         
         # Save these indices for later use
         self.emission_line_indices = np.array(line_indices)
+
+        # Double-check that the number of indices matches the number of ions
+        if len(line_indices) != len(self.ion_list):
+            print(f"Warning: Number of indices ({len(line_indices)}) doesn't match number of ions ({len(self.ion_list)})")
 
         # Print diagnostic information
         print(f"Found {len(line_indices)} emission line indices")

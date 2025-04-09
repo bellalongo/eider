@@ -112,31 +112,14 @@ class DEM:
         flux = self.gtmatrix.ion_fluxes
         err = self.gtmatrix.ion_errs
 
-        print(f"Shape of flux array: {flux.shape}")
-        print(f"Shape of error array: {err.shape}")
-
         # Get the emission line indices by calling the method
         indices = self.gtmatrix.get_emission_line_indices()
-        
+
         # Make sure indices are within bounds
         valid_indices = [idx for idx in indices if idx < self.gtmatrix.gtmat.shape[0]]
 
-        gtmat_subset = self.gtmatrix.gtmat[self.gtmatrix.get_emission_line_indices()]
-
-        # Ensure flux and error arrays have the same length as gtmat_subset
+        # Get the subset of the G(T) matrix using valid indices
         gtmat_subset = self.gtmatrix.gtmat[valid_indices]
-        
-        # Make sure flux and error arrays correspond to valid indices
-        # This ensures all arrays have the same length
-        flux = flux[:len(valid_indices)]
-        err = err[:len(valid_indices)]
-        
-        print(f"Using {len(valid_indices)} emission lines for fitting")
-        print(f"Shape of gtmat_subset: {gtmat_subset.shape}")
-        print(f"Shape of flux array: {flux.shape}")
-        print(f"Shape of error array: {err.shape}")
-
-
         
         # Create MCMC configuration
         config = MCMCConfig(
