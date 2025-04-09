@@ -214,6 +214,17 @@ class GTMatrix:
         except Exception as e:
             print(f'FreeFree calculation failed for {ion_str}: {str(e)}')
 
+    def _update_ion_list_data(self, ion_str):
+        # Track the current ion's fluxes
+        ion_mask = np.where(self.chianti_table['Ion'] == ion_str)
+
+        # Update flux and error if the ion has observed lines
+        if len(ion_mask[0]) > 0:
+            ion_idx = np.where(self.ion_list == ion_str)[0][0]
+            self.ion_fluxes[ion_idx] = np.sum(self.chianti_table['Flux'][ion_mask].data)
+            self.ion_errs[ion_idx] = np.sqrt(
+                            np.sum((self.chianti_table['Error'][ion_mask].data)**2))
+
     def _gtmat_single_ion(self, 
                           ion_str: str, 
                           wavelength_lower: np.ndarray, 
@@ -234,15 +245,8 @@ class GTMatrix:
         if curr_ion.Z > 2.0:
             gtmat_prefactor *= 10.0**self.abundance
 
-        # Track the current ion's fluxes
-        ion_mask = np.where(self.chianti_table['Ion'] == ion_str)
-
         # Update flux and error if the ion has observed lines
-        if len(ion_mask[0]) > 0:
-            ion_idx = np.where(self.ion_list == ion_str)[0][0]
-            self.ion_fluxes[ion_idx] = np.sum(self.chianti_table['Flux'][ion_mask])
-            self.ion_errs[ion_idx] = np.sqrt(
-                np.sum((self.chianti_table['Error'][ion_mask])**2))
+        self._update_ion_list_data(ion_str)
             
         # Iterate through wavelength pairs and add contributions
         try:
@@ -256,6 +260,31 @@ class GTMatrix:
                     self.gtmat[i, :] += gtmat_prefactor * curr_ion.Emiss['emiss'][line_idx]
         except Exception as e:
             print(f'Failed to process wavelength contributions for {ion_str}: {str(e)}')
+
+    def _update_ion_flux_data(self, ion_str):
+        """
+
+        """
+        # Find measurements for this ion
+        ion_mask = np.where(self.chianti_table['Ion'] == ion_str)[0]
+        
+        # Skip if no measurements
+        if len(ion_mask) == 0:
+            return
+            
+        # Get ion index
+        try:
+            ion_idx = np.where(self.ion_list == ion_str)[0][0]
+        except IndexError:
+            print(f"Warning: Ion {ion_str} not found in ion_list")
+            return
+        
+        # Get flux values
+        fluxes = self.chianti_table['Flux'][ion_mask].data
+        self.ion_fluxes[ion_idx] = np.sum(fluxes)
+        
+        errors = self.chianti_table['Error'][ion_mask].data
+        self.ion_errs[ion_idx] = np.sqrt(np.sum(errors**2))
 
     # ------------------------------
     # Public Methods
@@ -303,14 +332,13 @@ class GTMatrix:
         
         # Extract unique ions and initialize arrays
         self.ion_list = np.unique(self.chianti_table['Ion'])
-        self.ion_fluxes = self.chianti_table['Flux']
         self.ion_fluxes = np.zeros(len(self.ion_list))
         self.ion_errs = np.zeros_like(self.ion_fluxes)
 
         print(f"Loaded emission line data: {len(self.ion_list)} unique ions with emission line measurements")
 
     def generate_gtmatrix(self, 
-                          pressure: float = None) -> None:
+                          pressure: float = None) -> None: # UPDATE ME TO BE ABLE TO PROCESS MULTIPLE PRESSURE LISTS ???
         """
 
         """
@@ -324,7 +352,7 @@ class GTMatrix:
         # Create upper and lower bounds for the wavelengths
         wavelength_lower = self.wave_arr - (0.5 * self.bin_arr)
         wavelength_upper = wavelength_lower + self.bin_arr
-        
+
         # Create the pressure-specific filename
         curr_gtmat_str = (f'{self.gtmat_str}_p{str(int(np.log10(pressure)))}'
                           f'_{self.abundance_type}.npy')
@@ -333,12 +361,15 @@ class GTMatrix:
         # Check if matrix already exists
         if exists(curr_gtmat_path):
             self.gtmat = np.load(curr_gtmat_path)
+
+            # Update flux data for each ion still needed
+            for ion in self.ion_list:
+                self._update_ion_flux_data(ion)
+
+            print(self.ion_fluxes)
+
             print(f'Loaded existing matrix: {curr_gtmat_str}')
             return
-            
-        # Make sure line data is loaded
-        if self.chianti_table is None:
-            self.load_line_data()
             
         # Initialize with zeros for full matrix
         self.gtmat = np.zeros((len(wavelength_lower), len(self.temp)))
@@ -361,10 +392,6 @@ class GTMatrix:
         """
 
         """
-        # Make sure we're initialized
-        if self.temp is None or self.wave_arr is None:
-            self.initialize()
-            
         # Process each pressure in the list
         for pressure in self.pressure_list:
             self.generate_gtmatrix(pressure)
@@ -434,34 +461,35 @@ class GTMatrix:
         
     def get_emission_line_indices(self):
         """
-
+        Get indices of wavelength bins corresponding to measured emission lines.
+        
+        Returns:
+            Array of indices into the G(T) matrix
         """
         if not hasattr(self, 'ion_list') or self.ion_list is None:
             raise ValueError("No emission line data loaded. Call load_line_data() first.")
         
         # Initialize array to store indices
         line_indices = []
-
-        # Process each unique ion
-        for ion in self.ion_list:
-            # Find all measurements for this ion
-            ion_mask = self.chianti_table['Ion'] == ion
-            
-            # Get wavelengths and fluxes for this ion
-            ion_wavelengths = self.chianti_table['Rest Wavelength'][ion_mask]
-            ion_fluxes = self.chianti_table['Flux'][ion_mask]
-            
-            # Choose the representative wavelength (strongest line)
-            if len(ion_wavelengths) > 0:
-                # Use the wavelength with the highest flux
-                best_idx = np.argmax(ion_fluxes)
-                rep_wavelength = ion_wavelengths[best_idx]
-                
-                # Find the corresponding index in the wavelength grid
-                index = np.argmin(np.abs(self.wave_arr - rep_wavelength))
-                line_indices.append(index)
         
-        # Save these indices for later use
+        # Process each unique ion
+        for _, ion in enumerate(self.ion_list):
+            # Find all measurements for this ion in the CHIANTI table
+            ion_mask = np.where(self.chianti_table['Ion'] == ion)[0]
+            
+            if len(ion_mask) > 0:
+                # Get wavelengths for this ion
+                wvls = self.chianti_table['Rest Wavelength'][ion_mask].data # APPLY LOGIC EVERYWHERE !
+                fluxes = self.chianti_table['Flux'][ion_mask].data
+                
+                # Use strongest line for each ion
+                strongest_idx = np.argmax(fluxes)
+                wavelength = wvls[strongest_idx]
+                
+                # Find closest wavelength bin
+                idx = np.argmin(np.abs(self.wave_arr - wavelength))
+        
+        # Store indices for later use
         self.emission_line_indices = np.array(line_indices)
-
+        
         return self.emission_line_indices

@@ -50,19 +50,35 @@ SPECTRUM_CONFIG = {
 # ------------------------------
 # DEM Configuration
 # ------------------------------
+# DEM_CONFIG = {
+#     'n_walkers': 100,                    # Number of MCMC walkers
+#     'burn_in_steps': 200,               # Number of burn-in steps
+#     'production_steps': 800,            # Number of production steps
+#     'thread_num': 4,                    # Number of threads for parallel processing
+#     'progress_interval': 100,           # something ?
+#     'init_chebyshev': [                 # Initial Chebyshev coefficients
+#         22.49331207,  # c₀: First Chebyshev coefficient - sets overall DEM magnitude
+#         -3.31678227,  # c₁: Second Chebyshev coefficient  
+#         -0.49848262,  # c₂: Third Chebyshev coefficient
+#         -1.27244452,  # c₃: Fourth Chebyshev coefficient
+#         -0.93897032,  # c₄: Fifth Chebyshev coefficient
+#         -0.67235648,  # c₅: Sixth Chebyshev coefficient
+#         -0.08085897   # Flux factor uncertainty (in log space)
+#     ]
+# }
 DEM_CONFIG = {
-    'n_walkers': 50,                    # Number of MCMC walkers
-    'burn_in_steps': 200,               # Number of burn-in steps
-    'production_steps': 800,            # Number of production steps
-    'thread_num': 4,                    # Number of threads for parallel processing
-    'progress_interval': 100,           # something ?
-    'init_chebyshev': [                 # Initial Chebyshev coefficients
-        22.49331207,  # c₀: First Chebyshev coefficient - sets overall DEM magnitude
-        -3.31678227,  # c₁: Second Chebyshev coefficient  
-        -0.49848262,  # c₂: Third Chebyshev coefficient
-        -1.27244452,  # c₃: Fourth Chebyshev coefficient
-        -0.93897032,  # c₄: Fifth Chebyshev coefficient
-        -0.67235648,  # c₅: Sixth Chebyshev coefficient
-        -0.08085897   # Flux factor uncertainty (in log space)
+    'n_walkers': 100,                  # Increase number of walkers
+    'burn_in_steps': 500,              # Increase burn-in steps
+    'production_steps': 1000,          # Increase production steps
+    'thread_num': 4,
+    'progress_interval': 100,
+    'init_chebyshev': [                # Try these starting values
+        22.0,                          # Higher baseline
+        -2.5,                          # Adjust slope
+        -0.8,                          # Adjust curvature
+        -1.0,                          # Additional terms
+        -0.5,
+        -0.2,
+        -0.1                           # Flux factor uncertainty
     ]
 }

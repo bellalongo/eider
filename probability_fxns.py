@@ -8,23 +8,23 @@ from jax import numpy as jnp
 class DEMPriors:
     @staticmethod
     def chebyshev_prior(params: List[float],
-                        psi_low: float = 20.0,
-                        psi_high: float = 24.0) -> float:
+                        psi_low: float = 18.0,  # Lower bound for Tau Ceti
+                        psi_high: float = 26.0) -> float:
         """
-
+        Prior function for Chebyshev polynomial DEM model.
         """
-        flux_factor = params[-1] # Grab the flux factor uncertainty parameter 
-        coeffs = params[:-1] # Grab all of the Chebyshev coefficents
-        lp = 0.0 # Log prior 
-
-        # Add penalties to log prior based on coefficent values
+        flux_factor = params[-1]
+        coeffs = params[:-1]
+        lp = 0.0
+        
+        # Add penalties based on coefficient values
         if coeffs[0] >= psi_high:
-            lp += psi_high - coeffs[0] # Penalty for being too high
+            lp += psi_high - coeffs[0]
         elif coeffs[0] <= psi_low:
-            lp += coeffs[0] - psi_low # Penalty for being too low
-
+            lp += coeffs[0] - psi_low
+        
         # Check polynomial value at 0
-        if chebval(0.0, coeffs) <= 20.0:
+        if chebval(0.0, coeffs) <= 15.0:  # Lower threshold for Tau Ceti
             return -np.inf
         
         # Check coefficient magnitudes
@@ -33,14 +33,14 @@ class DEMPriors:
                 return -np.inf
         
         # Check flux factor bounds
-        if not (-1.0 <= flux_factor <= 1.0):
+        if not (-2.0 <= flux_factor <= 2.0):  # Wider range for flexibility
             return -np.inf
         
         # Check polynomial behavior at endpoints
         if (chebval(-1.0, coeffs) <= chebval(-0.99, coeffs) or
             chebval(1.0, coeffs) >= chebval(0.99, coeffs)):
             return -np.inf
-
+        
         return lp
     
     
