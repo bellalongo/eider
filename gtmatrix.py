@@ -488,8 +488,11 @@ class GTMatrix:
                 
                 # Find closest wavelength bin
                 idx = np.argmin(np.abs(self.wave_arr - wavelength))
+                line_indices.append(idx)
         
         # Store indices for later use
         self.emission_line_indices = np.array(line_indices)
+
+        print(f'INDICIES: {self.emission_line_indices}')
         
         return self.emission_line_indices
