@@ -4,10 +4,10 @@ from astropy import units as u
 # Star Parameters
 # ------------------------------
 STAR_CONFIG = {
-    'star_name' : 'EX',                                 # Star identifier
-    'star_radius' : 0.75 * u.Rsun,                      # Stellar radius
-    'star_distance' : 9.7140 * u.pc,                    # Distance to star
-    'abundance' : 0.0,                                  # Abundance modifier (0.0 = solar)
+    'star_name' : 'Tau-Ceti',                                 # Star identifier
+    'star_radius' : 0.793 * u.Rsun,                      # Stellar radius
+    'star_distance' : 3.65 * u.pc,                    # Distance to star
+    'abundance' : -0.5,                                  # Abundance modifier (0.0 = solar) -> log
 }                                               
 
 # ------------------------------

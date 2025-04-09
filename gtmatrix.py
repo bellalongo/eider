@@ -294,13 +294,19 @@ class GTMatrix:
         """
         # Create the CHIANTI table
         self.chianti_table = self._create_chianti_table()
+
+        # Filter out lines with negative flux or zero error (noise)
+        valid_lines = np.where(self.chianti_table['Error'] != 0.0)[0]
+
+        # Create a new filtered table
+        self.chianti_table = self.chianti_table[valid_lines]
         
         # Extract unique ions and initialize arrays
         self.ion_list = np.unique(self.chianti_table['Ion'])
         self.ion_fluxes = np.zeros(len(self.ion_list))
         self.ion_errs = np.zeros_like(self.ion_fluxes)
         
-        print(f"Loaded emission line data: {len(self.ion_list)} unique ions")
+        print(f"Loaded emission line data: {len(self.ion_list)} unique ions with emission line measurements")
 
     def generate_gtmatrix(self, 
                           pressure: float = None) -> None:
@@ -433,7 +439,7 @@ class GTMatrix:
             raise ValueError("No emission line data loaded. Call load_line_data() first.")
             
         # Get wavelengths of emission lines from the chianti_table
-        emission_line_wavelengths = self.chianti_table['Wavelength_vacuum']
+        emission_line_wavelengths = self.chianti_table['Rest Wavelength']
         
         # Initialize array to store indices
         line_indices = []
@@ -442,9 +448,15 @@ class GTMatrix:
         for line_wave in emission_line_wavelengths:
             # Find the index of the wavelength bin that contains this emission line
             index = np.argmin(np.abs(self.wave_arr - line_wave))
-            line_indices.append(index)
+            
+            # Make sure the index is within bounds
+            if 0 <= index < len(self.wave_arr):
+                line_indices.append(index)
         
         # Save these indices for later use
         self.emission_line_indices = np.array(line_indices)
+
+        # Print diagnostic information
+        print(f"Found {len(line_indices)} emission line indices")
         
         return self.emission_line_indices
