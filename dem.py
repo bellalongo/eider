@@ -9,6 +9,8 @@ from scipy.integrate import cumulative_trapezoid
 import roman
 import os
 from os.path import exists
+import corner
+
 
 class DEM:
     """
@@ -65,7 +67,7 @@ class DEM:
 
         """
         # Extract star parameters
-        self.star_name = self.star_config['star_name']
+        self.star_name = self.star_config['star_name'].lower() # fix me ?
         self.radius = self.star_config['star_radius']
         self.distance = self.star_config['star_distance']
         
@@ -78,6 +80,9 @@ class DEM:
         
         # Extract initial Chebyshev coefficients
         self.init_chebyshev = self.dem_config['init_chebyshev']
+
+        self.psi_low = self.dem_config['psi_low']
+        self.psi_high = self.dem_config['psi_high']
 
     def _check_existing_results(self) -> bool:
         """
@@ -114,6 +119,10 @@ class DEM:
             # Get flux and error data
             flux = self.gtmatrix.ion_fluxes
             err = self.gtmatrix.ion_errs
+
+            # Get psi data
+            psi_low = self.psi_low
+            psi_high = self.psi_high
             
             # Get indices of emission lines with valid measurements
             indices = self.gtmatrix.get_emission_line_indices()
@@ -140,6 +149,8 @@ class DEM:
             
             # Package likelihood arguments
             likelihood_args = [
+                psi_low,
+                psi_high,
                 flux,
                 err, 
                 self.log_temp,
@@ -296,3 +307,46 @@ class DEM:
         plt.savefig(f'plots/dem_{self.star_name}.png', dpi=300)
         
         return plt.gcf()
+    
+    
+    # Add this method to the DEM class
+    def create_corner_plot(self, 
+                        labels=None, 
+                        truths=None, 
+                        quantiles=[0.16, 0.5, 0.84], 
+                        show_titles=True):
+        """
+
+        """
+        # Check if MCMC has been run
+        if self.samples is None:
+            print("No MCMC results available. Run run_mcmc() first.")
+            return None
+        
+        # Create default labels if none provided
+        if labels is None:
+            n_params = self.samples.shape[1]
+            c_labels = [f"c{i}" for i in range(n_params-1)]
+            labels = c_labels + ["Flux Factor"]
+        
+        # Create and save the corner plot
+        fig = corner.corner(self.samples, 
+                        labels=labels,
+                        quantiles=quantiles,
+                        show_titles=show_titles, 
+                        title_kwargs={"fontsize": 12},
+                        truths=truths,
+                        plot_contours=True)
+        
+        # Add a title
+        plt.suptitle(f"{self.star_name} - Parameter Distributions", 
+                    fontsize=16, y=1.02)
+        
+        # Ensure output directory exists
+        os.makedirs('plots', exist_ok=True)
+        
+        # Save the figure
+        plt.savefig(f'plots/corner_{self.star_name}.png', dpi=300, bbox_inches='tight')
+        print(f"Corner plot saved to plots/corner_{self.star_name}.png")
+        
+        return fig

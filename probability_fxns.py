@@ -1,15 +1,16 @@
 from typing import List, Union
 from numpy.polynomial.chebyshev import chebval
 import numpy as np
-from gtmatrix import *
 from tinygp import kernels, GaussianProcess
 from jax import numpy as jnp
+
+from gtmatrix import *
 
 class DEMPriors:
     @staticmethod
     def chebyshev_prior(params: List[float],
-                        psi_low: float = 18.0,
-                        psi_high: float = 26.0) -> float:
+                        psi_low: float,
+                        psi_high: float) -> float:
         """
         Prior function for Chebyshev polynomial DEM model.
         """
@@ -46,8 +47,8 @@ class DEMPriors:
     
     @staticmethod
     def gp_prior(params: List[float], 
-                 psi_low: float = 19.0,
-                 psi_high: float = 26.0) -> float:
+                 psi_low: float,
+                 psi_high: float) -> float:
         """
 
         """
@@ -161,6 +162,8 @@ class DEMLikelihood:
 
 @staticmethod
 def ln_likelihood_dem(params: List[float], 
+                      psi_low : float,
+                      psi_high : float,
                       y: np.ndarray,
                       yerr: Union[np.ndarray, float],
                       log_temp: np.ndarray, temp: np.ndarray,
@@ -170,7 +173,7 @@ def ln_likelihood_dem(params: List[float],
 
     """
     # Define log prior
-    lp = DEMPriors.chebyshev_prior(params)
+    lp = DEMPriors.chebyshev_prior(params, psi_low, psi_high)
 
     # Return infinite log priors
     if np.isfinite(lp):
@@ -182,6 +185,8 @@ def ln_likelihood_dem(params: List[float],
 
 @staticmethod
 def ln_likelihood_gp(params: List[float], 
+                     psi_low : float,
+                     psi_high : float,
                      knot_locs: np.ndarray,
                      y: np.ndarray, 
                      yerr: Union[np.ndarray, float],
@@ -192,7 +197,7 @@ def ln_likelihood_gp(params: List[float],
 
     """
     # Define log prior
-    lp = DEMPriors.gp_prior(params)
+    lp = DEMPriors.gp_prior(params, psi_low, psi_high)
 
     # Return infinite log priors
     if np.isfinite(lp):

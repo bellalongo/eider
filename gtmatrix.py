@@ -57,7 +57,7 @@ class GTMatrix:
 
         """
         # Extract star parameters from star config
-        self.star_name = self.star_config['star_name']
+        self.star_name = self.star_config['star_name'].lower()
         self.abundance = self.star_config['abundance']
         
         # Extract GTMatrix parameters from config
@@ -148,6 +148,7 @@ class GTMatrix:
                          abundance=self.abundance_file)
             ion.intensity()
             return ion
+        
         except (AttributeError, KeyError) as e:
             print(f"Warning: Failed to process ion {ion_str}: {str(e)}")
             return None
@@ -168,14 +169,17 @@ class GTMatrix:
         if ion_str not in ['h_2', 'he_3']:
             try:
                 curr_ion.twoPhoton(self.wave_arr)
+
                 if 'intensity' in curr_ion.TwoPhoton.keys():
                     # Add two-photon contribution
                     twophot_contrib = curr_ion.TwoPhoton['intensity'].T
                     twophot_contrib *= self.bin_arr.reshape((len(self.bin_arr), 1))
                     tp_mask = np.where(np.isfinite(twophot_contrib))
                     self.gtmat[tp_mask] += twophot_contrib[tp_mask]
+
                 else:
                     print(f'No two-photon intensity calculated for {ion_str}')
+
             except Exception as e:
                 print(f'Two-photon calculation failed for {ion_str}: {str(e)}')
 
@@ -203,18 +207,32 @@ class GTMatrix:
 
         """
         try:
+            # Calculate the free-free emission across the wavelength array
             cont.freeFree(self.wave_arr)
+
+            # Check if the result contains 'intensity' data
             if 'intensity' in cont.FreeFree.keys():
+                # Transpose the intensity array to align with expected dimensions
                 freefree_contrib = cont.FreeFree['intensity'].T
+
+                # Apply the binning factor across wavelength bins
                 freefree_contrib *= self.bin_arr.reshape((len(self.bin_arr), 1))
+
+                # Mask out any non-finite values 
                 ff_mask = np.where(np.isfinite(freefree_contrib))
+
+                 # Add the valid ff contributions to gtmat
                 self.gtmat[ff_mask] += freefree_contrib[ff_mask]
             else:
                 print(f'No FreeFree intensity calculated for {ion_str}')
+
         except Exception as e:
             print(f'FreeFree calculation failed for {ion_str}: {str(e)}')
 
     def _update_ion_list_data(self, ion_str):
+        """
+            
+        """
         # Track the current ion's fluxes
         ion_mask = np.where(self.chianti_table['Ion'] == ion_str)
 
@@ -438,7 +456,7 @@ class GTMatrix:
         plt.show()
         
         # Save if a path is provided
-        save_path = f'plots/{self.star_name}_gtmat_heatmap'
+        save_path = f'plots/gtmat_{self.star_name}_heatmap.png'
         plt.savefig(save_path, dpi=300)
         print(f"Heatmap saved to {save_path}")
 

@@ -7,7 +7,7 @@ STAR_CONFIG = {
     'star_name' : 'Tau-Ceti',                                 # Star identifier
     'star_radius' : 0.793 * u.Rsun,                      # Stellar radius
     'star_distance' : 3.65 * u.pc,                    # Distance to star
-    'abundance' : -0.5,                                  # Abundance modifier (0.0 = solar) -> log
+    'abundance' : -0.3,                                  # Abundance modifier (0.0 = solar) -> log
 }                                               
 
 # ------------------------------
@@ -29,7 +29,7 @@ GTMAT_CONFIG = {
     'min_wavelength': 1,                # Minimum wavelength in Angstroms
     'max_wavelength': 1500,             # Maximum wavelength in Angstroms
     'rconst': 100,                      # Spectral resolving power
-    'min_templog': 4,                   # Minimum temperature in log scale
+    'min_templog': 3,                   # Minimum temperature in log scale
     'max_templog': 8,                   # Maximum temperature in log scale
     'npoints': 200,                     # Number of temperature points
     'pressure_list': [1e17]             # List of pressures for analysis
@@ -67,18 +67,21 @@ SPECTRUM_CONFIG = {
 #     ]
 # }
 DEM_CONFIG = {
-    'n_walkers': 100,                  # Increase number of walkers
-    'burn_in_steps': 500,              # Increase burn-in steps
-    'production_steps': 1000,          # Increase production steps
+    'n_walkers': 100,                  
+    'burn_in_steps': 500,              
+    'production_steps': 1000,          
     'thread_num': 4,
     'progress_interval': 100,
-    'init_chebyshev': [                # Try these starting values
-        22.0,                          # Higher baseline
-        -2.5,                          # Adjust slope
-        -0.8,                          # Adjust curvature
-        -1.0,                          # Additional terms
-        -0.5,
-        -0.2,
-        -0.1                           # Flux factor uncertainty
-    ]
+    'init_chebyshev': [                
+        22.0,        # Overall magnitude (more reasonable value)
+        -2.0,        # Gentle slope 
+        -0.3,        # Very small curvature
+        0.0,         # Start with zero for higher order terms
+        0.0,         
+        0.0,                          
+        -1.0         # Larger uncertainty to allow exploration
+    ],
+    'psi_low': 18,
+    'psi_high': 28
 }
+
