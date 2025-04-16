@@ -8,7 +8,7 @@ from jax import numpy as jnp
 class DEMPriors:
     @staticmethod
     def chebyshev_prior(params: List[float],
-                        psi_low: float = 18.0,  # Lower bound for Tau Ceti
+                        psi_low: float = 18.0,
                         psi_high: float = 26.0) -> float:
         """
         Prior function for Chebyshev polynomial DEM model.

@@ -1,18 +1,17 @@
 import os
 
+# Set environment variable before any other imports
+if 'XUVTOP' not in os.environ:
+    os.environ['XUVTOP'] = '/Users/bella/Desktop/LASP/Stars/CHIANTI_10.1_database'
+    print(f"XUVTOP environment set to {os.environ['XUVTOP']}")
+
 from utils import *
 from gtmatrix import *
 from spectrum import *
 from dem import *
 from config import *
 
-
 def main():
-    # Set environment variable before any other imports
-    if 'XUVTOP' not in os.environ:
-        os.environ['XUVTOP'] = '/Users/bella/Desktop/LASP/Stars/CHIANTI_10.1_database'
-        print(f"XUVTOP environment set to {os.environ['XUVTOP']}")
-
     # Create output directories
     create_directories(PATH_CONFIG)
 

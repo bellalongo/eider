@@ -110,7 +110,7 @@ class GTMatrix:
     def _create_chianti_table(self) -> Table:
         """
 
-        """
+        """  
         try:
             # Read from the ecsv file
             table = Table.read(self.flux_file, format='ascii.ecsv')
@@ -258,6 +258,7 @@ class GTMatrix:
                 # Add contributions from each line in this wavelength bin
                 for line_idx in np.where(mask)[0]:
                     self.gtmat[i, :] += gtmat_prefactor * curr_ion.Emiss['emiss'][line_idx]
+
         except Exception as e:
             print(f'Failed to process wavelength contributions for {ion_str}: {str(e)}')
 
@@ -366,8 +367,6 @@ class GTMatrix:
             for ion in self.ion_list:
                 self._update_ion_flux_data(ion)
 
-            print(self.ion_fluxes)
-
             print(f'Loaded existing matrix: {curr_gtmat_str}')
             return
             
@@ -461,10 +460,7 @@ class GTMatrix:
         
     def get_emission_line_indices(self):
         """
-        Get indices of wavelength bins corresponding to measured emission lines.
-        
-        Returns:
-            Array of indices into the G(T) matrix
+
         """
         if not hasattr(self, 'ion_list') or self.ion_list is None:
             raise ValueError("No emission line data loaded. Call load_line_data() first.")
@@ -492,7 +488,5 @@ class GTMatrix:
         
         # Store indices for later use
         self.emission_line_indices = np.array(line_indices)
-
-        print(f'INDICIES: {self.emission_line_indices}')
         
         return self.emission_line_indices

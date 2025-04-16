@@ -163,3 +163,5 @@ cython_debug/
 
 gtmat
 .DS_Store
+testing
+expected
