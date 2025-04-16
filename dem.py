@@ -223,14 +223,6 @@ class DEM:
         # IMPORTANT: Get G(T) matrix for emission lines only
         indices = self.gtmatrix.get_emission_line_indices()
         gofnt_matrix = np.array([self.gtmatrix.gtmat[idx] for idx in indices if idx < self.gtmatrix.gtmat.shape[0]])
-
-        print(f'INDICES: \n{indices}')
-        print(f'MATRIX: \n{gofnt_matrix}')
-
-        for row_data in gofnt_matrix:
-            for val in row_data:
-                if val != 0:
-                    print(True)
         
         # Calculate psi_y values properly
         psi_ys = []
@@ -268,14 +260,11 @@ class DEM:
         
         # Plot best-fit model
         plt.loglog(self.temp, psi_model, color=main_color, label='Best-fit DEM model')
-
-        print(f'THING:{psi_ys}')
         
         # Plot flux constraints - make sure they're visible
         for i in range(len(psi_ys)):
-            print(psi_ys[i], temp_lows[i], temp_upps[i])
             plt.hlines(psi_ys[i], temp_lows[i], temp_upps[i], 
-                    colors='k', linewidth=10, zorder=100)
+                    colors='k', linewidth=1, zorder=100)
         
         # Add a collective label for flux constraints
         plt.plot([], [], 'k-', linewidth=2, label='Flux Constraints')
@@ -295,7 +284,7 @@ class DEM:
         
         # Set plot limits and labels
         plt.ylim(10.0**low_y, 10.0**high_y)
-        plt.xlim(1e4, 1e8)
+        plt.xlim(1e4, 3e7)  # Focus on physically relevant range
         plt.xlabel('Temperature [K]')
         plt.ylabel(r'$\Psi(T) = N_e N_{\mathrm{H}} \frac{ds}{dT}$ [cm$^{-5}$ K$^{-1}$]')
         plt.title(f'{self.star_name} DEM')

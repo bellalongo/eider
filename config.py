@@ -68,20 +68,29 @@ SPECTRUM_CONFIG = {
 # }
 DEM_CONFIG = {
     'n_walkers': 100,                  
-    'burn_in_steps': 500,              
-    'production_steps': 1000,          
+    'burn_in_steps': 1000,              
+    'production_steps': 2000,          
     'thread_num': 4,
     'progress_interval': 100,
+    # 'init_chebyshev': [                
+    #     21.0,        # Overall magnitude - slightly lower than AU Mic
+    #     -4.0,        # Steeper slope to reflect G-type star decreasing DEM
+    #     -2.0,        # More curvature to capture bimodal distribution
+    #     -0.5,        # Non-zero higher terms for more complex shape
+    #     -0.3,        
+    #     -0.1,                          
+    #     -0.5         # Moderate uncertainty
+    # ],
     'init_chebyshev': [                
-        22.0,        # Overall magnitude (more reasonable value)
-        -2.0,        # Gentle slope 
-        -0.3,        # Very small curvature
-        0.0,         # Start with zero for higher order terms
-        0.0,         
-        0.0,                          
-        -1.0         # Larger uncertainty to allow exploration
+        21.5,       # Keep overall magnitude similar
+        -26.0,      # Keep slope similar to your current result
+        20.0,       # Reduce from 55 to a more moderate value
+        -50.0,      # Similar to your current result
+        20.0,       # Reduce from 52 to a more moderate value
+        -25.0,      # Similar to your current result          
+        -0.1        # Tighter uncertainty for more precise results
     ],
-    'psi_low': 18,
-    'psi_high': 28
+    'psi_low': 19,
+    'psi_high': 25
 }
 

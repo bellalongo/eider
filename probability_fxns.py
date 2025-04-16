@@ -42,6 +42,15 @@ class DEMPriors:
             chebval(1.0, coeffs) >= chebval(0.99, coeffs)):
             return -np.inf
         
+        # Add regularization to prevent extreme oscillations -> MAYBE DELETE
+        oscillation_penalty = 0.0
+        for i in range(1, len(coeffs)-1):
+            if abs(coeffs[i]) > 20 and abs(coeffs[i+1]) > 20:
+                if coeffs[i] * coeffs[i+1] < 0:  # Opposite signs
+                    oscillation_penalty -= abs(coeffs[i] * coeffs[i+1]) / 1000.0
+        
+        return lp + oscillation_penalty
+        
         return lp
     
     
