@@ -8,18 +8,18 @@ This directory contains documentation for running and using the EIDER package.
 
 Before using EIDER, ensure you have the following dependencies installed:
 
-- Python 3.6+
-- numpy
-- matplotlib
-- astropy
-- emcee
-- corner
-- ChiantiPy
-- seaborn
-- scipy
-- jax
-- tinygp
-- pandas
+[![astropy](https://img.shields.io/badge/astropy-red?style=for-the-badge)](https://astropy.org/)
+[![ChiantiPy](https://img.shields.io/badge/ChiantiPy-orange?style=for-the-badge)](https://chianti-atomic.github.io/)
+[![corner](https://img.shields.io/badge/corner-yellow?style=for-the-badge)](https://corner.readthedocs.io/)
+[![emcee](https://img.shields.io/badge/emcee-yellowgreen?style=for-the-badge)](https://emcee.readthedocs.io/)
+[![jax](https://img.shields.io/badge/jax-green?style=for-the-badge)](https://jax.readthedocs.io/)
+[![matplotlib](https://img.shields.io/badge/matplotlib-greenblue?style=for-the-badge)](https://matplotlib.org/stable/index.html)
+[![numpy](https://img.shields.io/badge/numpy-blue?style=for-the-badge)](https://numpy.org/doc/)
+[![pandas](https://img.shields.io/badge/pandas-darkblue?style=for-the-badge)](https://pandas.pydata.org/docs/)
+[![Python](https://img.shields.io/badge/Python-indigo?style=for-the-badge)](https://www.python.org/)
+[![scipy](https://img.shields.io/badge/scipy-violet?style=for-the-badge)](https://scipy.org/)
+[![seaborn](https://img.shields.io/badge/seaborn-darkviolet?style=for-the-badge)](https://seaborn.pydata.org/)
+[![tinygp](https://img.shields.io/badge/tinygp-purple?style=for-the-badge)](https://tinygp.readthedocs.io/)
 
 ChiantiPy requires additional setup to access atomic databases. Please refer to the [ChiantiPy documentation](https://chianti-atomic.github.io/) for installation instructions.
 
