@@ -1,30 +1,31 @@
 import os
+import sys
+
+sys.path.insert(0, '../') 
 
 # Set environment variable before any other imports
 if 'XUVTOP' not in os.environ:
     os.environ['XUVTOP'] = '/Users/bella/Desktop/LASP/Stars/CHIANTI_10.1_database'
     print(f"XUVTOP environment set to {os.environ['XUVTOP']}")
 
-from utils import *
-from gtmatrix import *
-from spectrum import *
-from dem import *
+import eider
 from config import *
+
 
 def main():
     # Create output directories
-    create_directories(PATH_CONFIG)
-    check_environment(PATH_CONFIG)
+    eider.create_directories(PATH_CONFIG)
+    eider.utils.check_environment(PATH_CONFIG)
 
     # Create GTMatrix 
-    gtmatrix = GTMatrix(STAR_CONFIG, GTMAT_CONFIG, PATH_CONFIG)
+    gtmatrix = eider.GTMatrix(STAR_CONFIG, GTMAT_CONFIG, PATH_CONFIG)
     gtmatrix.initialize()
     gtmatrix.load_line_data()
     gtmatrix.generate_all_matrices()
     gtmatrix.generate_heatmap()
 
     # Create DEM
-    dem = DEM(gtmatrix, DEM_CONFIG, STAR_CONFIG)
+    dem = eider.DEM(gtmatrix, DEM_CONFIG, STAR_CONFIG)
     
     # Run MCMC (or load existing results)
     samples, lnprob, _ = dem.run_mcmc()

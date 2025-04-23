@@ -1,11 +1,10 @@
-from fitting import MCMCFitter, MCMCConfig
-from probability_fxns import ln_likelihood_dem
+from eider.fitting import MCMCFitter, MCMCConfig
+from eider.probability_fxns import ln_likelihood_dem
 import numpy as np
 from astropy import units as u
 from typing import Tuple, Any, Dict, Optional
 import matplotlib.pyplot as plt
 from numpy.polynomial.chebyshev import chebval
-from scipy.integrate import cumulative_trapezoid
 import roman
 import os
 from os.path import exists

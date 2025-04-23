@@ -4,7 +4,7 @@ import numpy as np
 from tinygp import kernels, GaussianProcess
 from jax import numpy as jnp
 
-from gtmatrix import *
+from eider.gtmatrix import *
 
 class DEMPriors:
     """
